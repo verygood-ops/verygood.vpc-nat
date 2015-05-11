@@ -1,0 +1,5 @@
+---
+
+- name: Setup PAT and associate ETH1
+  script: files/nat.sh
+
