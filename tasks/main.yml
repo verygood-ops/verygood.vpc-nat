@@ -1,5 +1,12 @@
 ---
 
-- name: Setup PAT and associate ETH1
+- name: Setup PAT
   script: nat.sh
+
+- command: bash -c "ifconfig | grep eth1 | wc -l"
+  register: result
+
+- name: Associate ETH1
+  script: network.sh
+  when: result.stdout == "0"
 
