@@ -10,7 +10,7 @@ function die {
 }
 
 # Sanitize PATH
-PATH="/usr/sbin:/sbin:/usr/bin:/bin"
+PATH="/usr/sbin:/sbin:/usr/bin:/bin:/usr/local/bin"
 
 log "Beginning Port Address Translator (PAT) configuration..."
 log "Determining the MAC address on eth0..."
