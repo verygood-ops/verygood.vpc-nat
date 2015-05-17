@@ -3,7 +3,6 @@
 :INPUT ACCEPT [0:0]
 :FORWARD ACCEPT [0:0]
 :OUTPUT ACCEPT [0:0]
-{#:LOGGING - [0:0]#}
 
 # allow established traffic
 -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
@@ -25,9 +24,10 @@
 -A FORWARD -p {{ item.proto }} --dport {{ item.port }} -j ACCEPT
 {% endfor %}
 
+# allow icmp for sanity
+-A FORWARD -p icmp -j ACCEPT
+
 # everything else goes to logging
-{#-A FORWARD -j LOGGING#}
-# logging will log the entry
 -A FORWARD -m limit --limit 2/min -j LOG --log-prefix "IPTables-Dropped: "
 
 # denied outbound
@@ -50,5 +50,6 @@ COMMIT
 {% if iptables_vpc_cidr %}
 :POSTROUTING ACCEPT [0:0]
 -A POSTROUTING -s {{ iptables_vpc_cidr }} -o eth0 -j MASQUERADE
+-A POSTROUTING -s {{ iptables_vpc_cidr }} -o eth1 -j MASQUERADE
 {% endif %}
 COMMIT
