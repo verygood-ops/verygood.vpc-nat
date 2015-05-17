@@ -1,0 +1,6 @@
+---
+
+- name: load rules
+  template: src=rules.v4.j2 dest=/etc/iptables/rules.v4
+  notify:
+    - reload iptables

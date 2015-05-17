@@ -1,2 +1,7 @@
 ---
 # handlers file for vpc-nat
+- name: reload iptables
+  shell: iptables-restore < /etc/iptables/rules.v4
+
+- name: persist iptables
+  shell: iptables-save > /etc/iptables/rules.v4

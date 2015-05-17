@@ -1,2 +1,38 @@
 ---
 # defaults file for vpc-nat
+iptables_vpc_cidr: 10.4.0.0/16
+
+# denied outbound hosts
+iptables_denied_hosts:
+  - www.example.com
+
+# allowed outbound hosts
+iptables_allowed_hosts:
+  - host: us-east-1.ec2.archive.ubuntu.com
+    ports: [80, 443]
+    proto: tcp
+  - host: ppa.launchpad.net
+    ports: [80, 443]
+    proto: tcp
+  - host: security.ubuntu.com
+    ports: [80, 443]
+    proto: tcp
+  - host: 8.8.8.8
+    ports: [53]
+    proto: tcp
+  - host: 8.8.4.4
+    ports: [53]
+    proto: tcp
+
+# allowed outbound port/proto
+iptables_allowed_outbound: []
+#  - port: 443
+#    proto: tcp
+
+iptables_denied_outbound:
+  - port: 443
+    proto: tcp
+  - port: 80
+    proto: tcp
+
+iptables_deny_all_outbound: yes

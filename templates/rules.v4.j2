@@ -1,0 +1,54 @@
+# IP Table filter rules
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+{#:LOGGING - [0:0]#}
+
+# allow established traffic
+-A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+# denied hosts
+{% for host_name in iptables_denied_hosts %}
+-A FORWARD -d {{ host_name }} -j DROP -m comment --comment="{{ host_name }}"
+{% endfor %}
+
+# allowed hosts
+{% for host in iptables_allowed_hosts %}
+{% for port in host.ports %}
+-A FORWARD -d {{ host.host }} -p {{ host.proto }} --dport {{ port }} -j ACCEPT -m comment --comment="{{ host.host }}"
+{% endfor %}
+{% endfor %}
+
+# allowed oubount
+{% for item in iptables_allowed_outbound %}
+-A FORWARD -p {{ item.proto }} --dport {{ item.port }} -j ACCEPT
+{% endfor %}
+
+# everything else goes to logging
+{#-A FORWARD -j LOGGING#}
+# logging will log the entry
+-A FORWARD -m limit --limit 2/min -j LOG --log-prefix "IPTables-Dropped: "
+
+# denied outbound
+{% for item in iptables_denied_outbound %}
+-A FORWARD -p {{ item.proto }} --dport {{ item.port }} -j DROP
+{% endfor %}
+
+{% if iptables_deny_all_outbound %}
+# default drop all
+-A FORWARD -j DROP
+{% endif %}
+
+COMMIT
+
+# IP Table NAT rules
+*nat
+:PREROUTING ACCEPT [227:15507]
+:INPUT ACCEPT [36:2056]
+:OUTPUT ACCEPT [277:23096]
+{% if iptables_vpc_cidr %}
+:POSTROUTING ACCEPT [0:0]
+-A POSTROUTING -s {{ iptables_vpc_cidr }} -o eth0 -j MASQUERADE
+{% endif %}
+COMMIT

@@ -10,3 +10,7 @@
   script: network.sh
   when: result.stdout == "0"
 
+- name: Establish IP table rules
+  include: iptables.yml
+  tags:
+    - iptables
