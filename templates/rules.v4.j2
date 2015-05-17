@@ -15,7 +15,7 @@
 # allowed hosts
 {% for host in iptables_allowed_hosts %}
 {% for port in host.ports %}
--A FORWARD -d {{ host.host }} -p {{ host.proto }} --dport {{ port }} -j ACCEPT -m comment --comment="{{ host.host }}"
+-A FORWARD -d {{ host.host }} -p {{ host.proto }} --dport {{ port }} -j ACCEPT -m comment --comment="{{ host.host }} {{ host.proto }} {{ port }}"
 {% endfor %}
 {% endfor %}
 
