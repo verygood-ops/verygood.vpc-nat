@@ -1,5 +1,8 @@
 ---
 
+- name: ensure iptables dir
+  file: path=/etc/iptables state=directory mode=075
+  
 - name: load rules
   template: src=rules.v4.j2 dest=/etc/iptables/rules.v4
   notify:
