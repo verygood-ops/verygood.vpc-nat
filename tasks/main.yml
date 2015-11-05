@@ -1,16 +1,7 @@
 ---
 
-- name: Setup PAT
-  script: nat.sh
+- name: Setup PAT and eth1
+  command: bash /opt/infra-vault/roles/verygood.vpc-nat/files/nat.sh
 
-- command: bash -c "ifconfig | grep eth1 | wc -l"
-  register: result
-
-- name: Associate ETH1
-  script: network.sh
-  when: result.stdout == "0"
-
-- name: Establish IP table rules
-  include: iptables.yml
-  tags:
-    - iptables
+- name: Setup routing
+  command: bash /opt/infra-vault/roles/verygood.vpc-nat/files/route.sh
