@@ -94,7 +94,7 @@ done
 ROUTE_TABLE=`aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$VPC_ID" "Name=tag-value,Values=$AVAILABILITY_ZONE" "Name=tag-key,Values=Region" | grep ROUTETABLES | grep -oP rtb-[a-zA-Z0-9]+`
 
 # replace route
-aws ec2 replace-route --route-table-id=$ROUTE_TABLE --destination-cidr-block=0.0.0.0/0 --network-interface-id `echo $NETWORK_INTERFACES | sed "s/$ENI_ID//"`
+aws ec2 replace-route --route-table-id=$ROUTE_TABLE --destination-cidr-block=0.0.0.0/0 --network-interface-id $ENI_ID
 
 cat /etc/network/interfaces.d/eth0.cfg | sed 's/eth0/eth1/' > /etc/network/interfaces.d/eth1.cfg
 
@@ -105,6 +105,15 @@ echo 2 eth1_rt >> /etc/iproute2/rt_tables ;
 echo "    up ip route add default via $EIP_GATEWAY dev eth1 table eth1_rt" >> /etc/network/interfaces.d/eth1.cfg
 echo "    up ip rule add from $EIP_IP_ADDRESS lookup eth1_rt prio 1000" >> /etc/network/interfaces.d/eth1.cfg
 
-ifup eth1
+while : ; do
+  if [ $(ifconfig eth1 | grep -o UP) = "UP" ]; then
+    log "eth1 is up and running!"
+    route add default gw $EIP_GATEWAY dev eth1
+    break
+  fi
+  log "waiting for eth1..."
+  ifdown eth1;ifup eth1
+  sleep 20
+done
 
-echo "finished"
+log "finished"
