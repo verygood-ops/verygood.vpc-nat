@@ -1,6 +1,6 @@
 ---
 # defaults file for vpc-nat
-iptables_vpc_cidr: 10.4.0.0/16
+iptables_vpc_cidr: "{{ ansible_default_ipv4.network | ipsubnet(16,0) }}"
 
 # denied outbound hosts
 iptables_denied_hosts:
